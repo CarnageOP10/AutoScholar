@@ -1,12 +1,13 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import WebsiteSearchTool
-from tools.custom_tool import addToVectorDB, getFromVectorDB, summarizeText
+from tools import SummarizeTextTool, AddToVectorDBTool, GetFromVectorDBTool
 
+# Initialize tools
 websearch = WebsiteSearchTool()
-summarier = summarizeText()
-add = addToVectorDB()
-get = getFromVectorDB()
+summarizer = SummarizeTextTool()
+vector_adder = AddToVectorDBTool()
+vector_querier = GetFromVectorDBTool()
 
 @CrewBase
 class AutoScholar():
@@ -14,12 +15,12 @@ class AutoScholar():
     tasks_config = 'config/tasks.yaml'
     agents_config = 'config/agents.yaml'
 
-    # Agents -----------------------------------------------------------------------------------------------------------------------------------
+    # Agents -------------------------------------------------------------------
     @agent
     def researcher(self) -> Agent:
         return Agent(
             config=self.agents_config['researcher'],
-            tools=[websearch, summarier, add],
+            tools=[websearch, summarizer, vector_adder],
             verbose=True
         )
 
@@ -27,7 +28,7 @@ class AutoScholar():
     def analyst(self) -> Agent:
         return Agent(
             config=self.agents_config['analyst'],
-            tools=[get],
+            tools=[vector_querier],
             verbose=True
         )
     
@@ -38,34 +39,35 @@ class AutoScholar():
             verbose=True
         )
 
-    # Tasks -----------------------------------------------------------------------------------------------------------------------------------
+    # Tasks -------------------------------------------------------------------
     @task
     def research_task(self) -> Task:
         return Task(
             config=self.tasks_config['research_task'],
+            agent=self.researcher()
         )
 
     @task
     def reporting_task(self) -> Task:
         return Task(
             config=self.tasks_config['reporting_task'],
+            agent=self.analyst()
         )
     
     @task
     def pdf_task(self) -> Task:
         return Task(
             config=self.tasks_config['pdf_task'],
-            output_file='report.md'
+            output_file='report.md',
+            agent=self.editor()
         )
 
-    # Crew -----------------------------------------------------------------------------------------------------------------------------------
+    # Crew -------------------------------------------------------------------
     @crew
     def crew(self) -> Crew:
-        
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )

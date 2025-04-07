@@ -1,27 +1,30 @@
 #!/usr/bin/env python
 import sys
 import warnings
-
 from datetime import datetime
-
 from auto_scholar.crew import AutoScholar
-
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 
 def run():
-    """
-    Run the crew.
-    """
     inputs = {
-        'topic': 'AI LLMs',
+        'topic': 'Vision Transformers',
         'current_year': str(datetime.now().year)
     }
     
     try:
-        AutoScholar().crew().kickoff(inputs=inputs)
+        result = AutoScholar().crew().kickoff(inputs=inputs)
+        
+        # Save the final report
+        with open("research_report.md", "w") as f:
+            f.write(result)
+        
+        print(f"✅ Research completed! Report saved to research_report.md")
+        print(f"✅ ChromaDB vector store persisted to 'chroma_db' directory")
+        
     except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+        print(f"❌ Error: {str(e)}")
+        sys.exit(1)
 
 
 def train():
