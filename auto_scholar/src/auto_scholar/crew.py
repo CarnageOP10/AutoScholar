@@ -1,13 +1,13 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai_tools import WebsiteSearchTool
-from tools import SummarizeTextTool, AddToVectorDBTool, GetFromVectorDBTool
+from tools.custom_tool import SummarizeTool, AddToVectorDBTool, QueryVectorDBTool, WebSearchTool
+from langchain_community.llms import HuggingFaceHub
 
 # Initialize tools
-websearch = WebsiteSearchTool()
-summarizer = SummarizeTextTool()
+websearch = WebSearchTool()
+summarizer = SummarizeTool()
 vector_adder = AddToVectorDBTool()
-vector_querier = GetFromVectorDBTool()
+vector_querier = QueryVectorDBTool()
 
 @CrewBase
 class AutoScholar():
@@ -70,4 +70,8 @@ class AutoScholar():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            llm=HuggingFaceHub(
+            repo_id="mistralai/Mistral-7B-Instruct-v0.1",
+            model_kwargs={"temperature": 0.7, "max_length": 3000}
+            )
         )
