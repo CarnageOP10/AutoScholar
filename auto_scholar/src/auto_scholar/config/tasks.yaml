@@ -1,0 +1,22 @@
+research_task:
+  description: >
+    Conduct a thorough research about {topic} and find the most relevant research papers.
+    Make sure you find any interesting and relevant information given
+    the current year is {current_year}.
+  expected_output: >
+    most relevant research papers related to {topic} and output them in a structured list along with summaries and links in a vector database.
+  agent: researcher
+
+reporting_task:
+  description: >
+    Extracts key insights, methodologies, results from the list provided by researcher.
+  expected_output: >
+    Structured notes (bullet points, tables, comparisons)
+  agent: analyst
+
+pdf_task:
+  description: >
+    Structure the notes provided by analyst into a well-organized and coherent report(LaTeX/Markdown)
+  expected_output: >
+    Final research document (PDF/HTML)
+  agent: editor
