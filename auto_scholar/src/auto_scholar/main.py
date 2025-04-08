@@ -4,7 +4,9 @@ import warnings
 from datetime import datetime
 from crew import AutoScholar
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
-
+import os
+import dotenv
+dotenv.load_dotenv()
 
 def run():
     inputs = {
